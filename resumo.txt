@@ -1,0 +1,40 @@
+esLint
+yarn add eslint -D
+yarn eslint init
+yarn add prettier eslint-config-prettier eslint-plugin-prettier babel-eslint -D
+
+==========================================================================================================
+
+
+react navigation
+yarn add react-navigation react-native-gesture-handler react-native-reanimated
+
+createAppContainer é como se fosse um browse router que contem as configurações
+para a rota funcionar idependernte do tipo de rota, smepre vai por fora
+
+createStackNavigator é um tipo de navegação
+creteaBootomNAvigator é um tipo de navegação
+createMAterialNAvigator é um tipo de navegação
+createDrawerNavigator é um tipo de navegação
+
+biblioteca de navegação
+yarn add react-navigation
+
+==========================================================================================================
+
+
+em src/index.js a import { StatusBar } from 'react-native'
+é para modificar a status bar
+
+            <StatusBar barStyle="light-content" backgroundColor="#7159c1"></StatusBar>
+
+            pode usar o hidden para esconder
+
+            <StatusBar hidden barStyle="light-content" backgroundColor="#7159c1"></StatusBar>
+
+==========================================================================================================
+
+Styled compoennts -> permite usar o mesmo css da web
+
+yarn add styled-components
+
