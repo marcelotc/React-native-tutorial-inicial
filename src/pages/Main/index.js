@@ -1,16 +1,19 @@
 import React, { Component } from 'react'
-import { Keyboard } from 'react-native'
+import { Keyboard, Button, View, Image, Text } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import api from '../../services/api'
 
 import { Container, Form, Input, SubmitButton, List, User, Avatar, Name, Bio, ProfileButton, ProfileButtonText } from './styles'
+import { FlatList } from 'react-native-gesture-handler';
 
 export default class Main extends Component {
     state = {
         newUser: '',
-        users: []
-    }
+        users: [],
+        dogs: []
 
+    } 
+ 
     handleAddUser = async () => {
         const { users, newUser } = this.state;
 
@@ -20,7 +23,7 @@ export default class Main extends Component {
             name: response.data.name,
             login: response.data.login,
             bio: response.data.bio,
-            avatar: response.data.avatar_url
+            avatar: response.data.avatar_url,
         }
 
         this.setState({
@@ -30,11 +33,26 @@ export default class Main extends Component {
 
         Keyboard.dismiss();
 
-    }
+    } 
 
+    geraDogs = async () => {
+        const { dogs } = this.state;
+
+        const responseDogs = await api.get('https://dog.ceo/api/breeds/image/random')
+
+        const data = {
+            dogImg: responseDogs.data.message,
+        }
+ 
+       this.setState({
+            dogs: [...dogs, data],
+        })
+
+    }   
+ 
     render() {
-        const { users, newUser } = this.state
-
+        const { users, newUser, dogs } = this.state
+     
         return (
             <Container>
                 <Form>
@@ -50,9 +68,24 @@ export default class Main extends Component {
                     <SubmitButton onPress={this.handleAddUser}>
                         <Icon name="add" size={20} color={"#fff"}></Icon>
                     </SubmitButton>
-                </Form>
 
-                <List
+                </Form>
+ 
+                <Button onPress={this.geraDogs} title="Geraa Dogs"
+                    style={{color: 'blue', fontSize: 30,}}
+                ></Button>
+                
+                <FlatList
+                    data={dogs}
+                    keyExtractor={dog => dog.dogImg}
+                    renderItem={({ item }) => (
+                        <View>
+                            <Avatar source={{ uri: item.dogImg }}></Avatar>
+                        </View> 
+                    )}
+                ></FlatList>       
+      
+                <List   
                     data={users}
                     keyExtractor={user => user.login}
                     renderItem={( {item} ) => (
@@ -69,6 +102,8 @@ export default class Main extends Component {
                 />
 
             </Container> 
+
+
         )
     }
 
