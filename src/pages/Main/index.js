@@ -1,21 +1,44 @@
 import React, { Component } from 'react'
-import { Keyboard, Button, View, Image, Text } from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import { Keyboard, ActivityIndicator, Text, View, Button } from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage';
+//import Icon from 'react-native-vector-icons/MaterialIcons'
 import api from '../../services/api'
-
+ 
 import { Container, Form, Input, SubmitButton, List, User, Avatar, Name, Bio, ProfileButton, ProfileButtonText } from './styles'
-import { FlatList } from 'react-native-gesture-handler';
 
 export default class Main extends Component {
+
+    static navigationOptions = {
+        title: 'Usuários'
+    } 
+
     state = {
         newUser: '',
         users: [],
-        dogs: []
+        loading: false
+    }   
 
-    } 
- 
+    async componentDidMount() { //busca os dados
+        const users = await AsyncStorage.getItem('users');
+
+        if (users) {
+            this.setState({ users: JSON.parse(users) })
+        }
+        
+    }               
+    
+    componentDidUpdate(_, prevState) { //executar quando houver alteração na variável users
+        const { users } = this.state;
+
+        if (prevState.users != users) {
+            AsyncStorage.setItem("users", JSON.stringify(users));
+        }
+    }   
+       
     handleAddUser = async () => {
         const { users, newUser } = this.state;
+
+        this.setState({ loading: true })
 
         const response = await api.get(`/users/${newUser}`)
 
@@ -28,32 +51,30 @@ export default class Main extends Component {
 
         this.setState({
             users: [...users, data],
-            newUsers: ''
+            newUsers: '',
+            loading: false
         })
 
         Keyboard.dismiss();
 
     } 
+    
+    handleNavigate = (user) => {
+        const { navigation } = this.props;
 
-    geraDogs = async () => {
-        const { dogs } = this.state;
+        navigation.navigate('User', { user });
+    }
 
-        const responseDogs = await api.get('https://dog.ceo/api/breeds/image/random')
-
-        const data = {
-            dogImg: responseDogs.data.message,
-        }
- 
-       this.setState({
-            dogs: [...dogs, data],
-        })
-
-    }   
- 
+    async clearStorage() {
+        AsyncStorage.clear();
+    }
+         
     render() {
-        const { users, newUser, dogs } = this.state
+        const { users, newUser, loading } = this.state
      
         return (
+            <>
+                
             <Container>
                 <Form>
                     <Input
@@ -65,26 +86,13 @@ export default class Main extends Component {
                         returnKeyType="send"
                         onSubmitEditing={this.handleAddUser}
                     ></Input>
-                    <SubmitButton onPress={this.handleAddUser}>
-                        <Icon name="add" size={20} color={"#fff"}></Icon>
+                    <SubmitButton loading={loading} onPress={this.handleAddUser}>
+                        {loading ? <ActivityIndicator color="#fff" />
+                            : <Text style={{ color: 'white' }}>+</Text>/*<Icon name="add" size={20} color={"#fff"}></Icon>*/}
                     </SubmitButton>
-
+  
                 </Form>
- 
-                <Button onPress={this.geraDogs} title="Geraa Dogs"
-                    style={{color: 'blue', fontSize: 30,}}
-                ></Button>
-                
-                <FlatList
-                    data={dogs}
-                    keyExtractor={dog => dog.dogImg}
-                    renderItem={({ item }) => (
-                        <View>
-                            <Avatar source={{ uri: item.dogImg }}></Avatar>
-                        </View> 
-                    )}
-                ></FlatList>       
-      
+   
                 <List   
                     data={users}
                     keyExtractor={user => user.login}
@@ -94,21 +102,21 @@ export default class Main extends Component {
                             <Name>{item.name}</Name>
                             <Bio>{item.bio}</Bio>
 
-                            <ProfileButton onPress={() => { }}>
-                                <ProfileButtonText>Ver perfil </ProfileButtonText>
-                            </ProfileButton>
+                            <ProfileButton onPress={ () => this.handleNavigate(item) }>
+                                <ProfileButtonText> Ver perfil </ProfileButtonText>
+                            </ProfileButton> 
                         </User>
                     )}
                 />
 
-            </Container> 
+                </Container>
+                
+                <View><Button onPress={this.clearStorage} title="Limpar"></Button></View>
+                
+            </>
 
-
-        )
+        ) 
     }
 
 } 
 
-Main.navigationOptions = {
-    title: 'Usuários',
-}               

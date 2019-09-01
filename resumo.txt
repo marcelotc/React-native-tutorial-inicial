@@ -5,6 +5,9 @@ yarn add prettier eslint-config-prettier eslint-plugin-prettier babel-eslint -D
 
 ==========================================================================================================
 
+yarn add axios
+
+==========================================================================================================
 
 react navigation
 yarn add react-navigation react-native-gesture-handler react-native-reanimated
@@ -45,3 +48,8 @@ adicionar icones em formato de vetor tipo font awesome
 yarn add react-native-vector-icons
 
 depois rodar 
+
+==========================================================================================================
+
+local storage do react native
+yarn add @react-native-community/async-storage
